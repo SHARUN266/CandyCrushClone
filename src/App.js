@@ -4,21 +4,28 @@ import green from "./images/green-candy.png";
 import orange from "./images/orange-candy.png";
 import red from "./images/red-candy.png";
 import yellow from "./images/yellow-candy.png";
-import blank from "./images/blank.png"
-import purpule from "./images/purple-candy.png"
+import blank from "./images/blank.png";
+import purpule from "./images/purple-candy.png";
+import ScoreBoard from "./components/ScoreBoard";
 const width = 8;
-const candyColors = [blue, green, orange, red, yellow,purpule];
+const candyColors = [blue, green, orange, red, yellow, purpule];
 function App() {
   const [squareDrag, setSquareDrag] = useState(null);
   const [squarePlace, setSquarePlace] = useState(null);
-
+  const [score, setScore] = useState(0);
   const [board, setBoard] = useState([]);
   const checkForColumnThree = () => {
-    for (let i = 0; i < 47; i++) {
+    for (let i = 0; i <= 47; i++) {
       const columnOfThree = [i, i + width, i + width * 2];
       const decideColor = board[i];
-      if (columnOfThree.every((square) => board[square] === decideColor)) {
-        columnOfThree.forEach((square) => (board[square] = blank));
+      const isBlank = board[i] === blank;
+      if (
+        columnOfThree.every(
+          (square) => board[square] === decideColor && !isBlank
+        )
+      ) {
+        setScore((score) => score + 3);
+        columnOfThree.forEach((square) => board[square] = blank);
         return true;
       }
     }
@@ -27,11 +34,13 @@ function App() {
     for (let i = 0; i < 64; i++) {
       const rowOfThree = [i, i + 1, i + 2];
       const decideColor = board[i];
-      const notValid = [
-        6, 7, 14, 15, 22, 23, 30, 31, 38, 39, 46, 47, 54, 55, 63, 64,
-      ];
+      const notValid = [6, 7, 14, 15, 22, 23, 30, 31, 38, 39, 46, 47, 54, 55, 63, 64]
+      const isBlank = board[i] === blank;
       if (notValid.includes(i)) continue;
-      if (rowOfThree.every((square) => board[square] === decideColor)) {
+      if (
+        rowOfThree.every((square) => board[square] === decideColor && !isBlank)
+      ) {
+        setScore((score) => score + 3);
         rowOfThree.forEach((square) => (board[square] = blank));
         return true;
       }
@@ -42,31 +51,40 @@ function App() {
       const rowOfFour = [i, i + 1, i + 2, i + 3];
       const decideColor = board[i];
       const notValid = [
-        5, 6, 7, 13, 14, 15, 21, 22, 23, 29, 30, 31, 37, 38, 39, 45, 46, 47, 53,
-        54, 55, 62, 63, 64,
+        5, 6, 7, 13, 14, 15, 21, 22, 23, 29, 30, 31, 37, 38, 39, 45, 46, 47, 53, 54, 55, 62, 63, 64
       ];
+      const isBlank = board[i] === blank;
       if (notValid.includes(i)) continue;
-      if (rowOfFour.every((square) => board[square] === decideColor)) {
-        rowOfFour.forEach((square) => (board[square] =blank));
+      if (
+        rowOfFour.every((square) => board[square] === decideColor && !isBlank)
+      ) {
+        setScore((score) => score + 4);
+        rowOfFour.forEach((square) => board[square] = blank);
         return true;
       }
     }
   };
   const checkForColumnFour = () => {
-    for (let i = 0; i < 39; i++) {
+    for (let i = 0; i <= 39; i++) {
       const columnOfFour = [i, i + width, i + width * 2, i + width * 3];
       const decideColor = board[i];
-      if (columnOfFour.every((square) => board[square] === decideColor)) {
-        columnOfFour.forEach((square) => (board[square] = blank));
+      const isBlank = board[i] === blank;
+      if (
+        columnOfFour.every(
+          (square) => board[square] === decideColor && !isBlank
+        )
+      ) {
+        setScore((score) => score + 4);
+        columnOfFour.forEach((square) => board[square] = blank);
         return true;
       }
     }
   };
   const moveintoSquareBelow = () => {
-    for (var i = 0; i < 64 - width; i++) {
-      const firstRow = [0, 1, 2, 3, 4, 5, 6, 7];
+    for (var i = 0; i <=55; i++) {
+      const firstRow =[0, 1, 2, 3, 4, 5, 6, 7]
       const isFirstRow = firstRow.includes(i);
-      if (isFirstRow && board[i] === "") {
+      if (isFirstRow && board[i] === blank) {
         let randomColor = Math.floor(Math.random() * board.length);
         board[i] = board[randomColor];
       }
@@ -113,8 +131,8 @@ function App() {
   const dragEnd = () => {
     let replace = squarePlace.getAttribute("data-id");
     let Dragged = squareDrag.getAttribute("data-id");
-    board[replace] = squareDrag.getAttribute('src');
-    board[Dragged] = squarePlace.getAttribute('src');
+    board[replace] = squareDrag.getAttribute("src");
+    board[Dragged] = squarePlace.getAttribute("src");
     const validMoves = [
       Dragged - 1,
       Dragged - width,
@@ -134,14 +152,15 @@ function App() {
       setSquareDrag(null);
       setSquarePlace(null);
     } else {
-      board[replace] = squarePlace.getAttribute('src');
-      board[Dragged] = squareDrag.getAttribute('src');
+      board[replace] = squarePlace.getAttribute("src");
+      board[Dragged] = squareDrag.getAttribute("src");
       setBoard([...board]);
     }
   };
   const dragDrop = (e) => {
     setSquarePlace(e.target);
   };
+  
   return (
     <div className="App">
       <div className="game">
@@ -157,11 +176,12 @@ function App() {
             onDrop={dragDrop}
             onDragStart={dragStart}
             onDragEnd={dragEnd}
-           // style={{ background: e }}
+            // style={{ background: e }}
             alt={e}
           />
         ))}
       </div>
+      <ScoreBoard score={score} />
     </div>
   );
 }
